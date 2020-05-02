@@ -1,6 +1,6 @@
 {
   "database": {
-    "rules": " "
+    "rules": "database.rules.json"
   },
   "functions": {
     "predeploy": [
@@ -9,7 +9,7 @@
     ]
   },
   "hosting": {
-    "public": "dist",
+    "public": "dist/terra",
     "ignore": [
       "firebase.json",
       "**/.*",

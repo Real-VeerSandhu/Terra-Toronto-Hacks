@@ -1,0 +1,12 @@
+<div class="main-container">
+    <div class="toolbar" (mouseenter)="hover()" (mouseleave)="unhover()">
+        <app-toolbar></app-toolbar>
+    </div>
+    <div [ngClass]="{unhover: !mouseOn, hover: mouseOn}">      
+        <button mat-stroked-button (click)="seed()">Seed Data</button>
+        <button mat-stroked-button (click)="covidGen()">Generate Covid Data</button>
+        <button mat-stroked-button (click)="allGen()">Generate All Data</button>
+        <button mat-stroked-button (click)="distanceFinder()">Calculate Distance</button>
+
+    </div> 
+</div>

@@ -6,6 +6,8 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { GeolocationService } from './services/geolocation.service';
 import { IonicStorageModule } from '@ionic/storage';
+import { firebaseConfig } from 'src/core/config';
+import { AngularFireModule } from '@angular/fire';
 
 
 
@@ -17,7 +19,8 @@ import { IonicStorageModule } from '@ionic/storage';
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
-    IonicStorageModule.forRoot()
+    IonicStorageModule.forRoot(),
+    AngularFireModule.initializeApp(firebaseConfig),
   ],
   exports: [
 
