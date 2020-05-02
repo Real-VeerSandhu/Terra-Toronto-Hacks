@@ -1,0 +1,71 @@
+:root {
+    font-size: 16px;
+    font-family: 'Baloo Thambi 2', cursive;
+    --primary: #42f5b6;
+    --text-primary: #b6b6b6;
+    --text-secondary: #ececec;
+    --bg-primary: #23232e;
+    --bg-secondary: #141418;
+    --transition-speed: 600ms;
+}
+
+body::-webkit-scrollbar {
+    width: 0.25rem;
+}
+
+body::-webkit-scrollbar-track {
+    background: #1e1e24;
+}
+
+body::-webkit-scrollbar-thumb {
+    background: var(--primary);
+}
+
+
+body {
+    margin: 0px;
+} 
+
+/* Common Styles for Toolbar Animations */
+
+@media only screen and (min-device-width: 600px) {
+    .main-container {
+        display: grid;
+        grid-template-columns: 6rem 1fr;
+    }
+    
+    .toolbar {
+        grid-column: 1;
+    }
+    
+    
+    .sub-container {
+        grid-column: 2;
+        width: 100%;
+        padding-left: 0px;
+        transition: 5000ms;
+    }
+    
+    
+    .hover {
+        grid-column: 2;
+        width: 100%;
+        padding-left: 9rem;
+        transition: 300ms;
+    }
+    
+    .unhover {
+        grid-column: 2;
+        width: 100%;
+        padding-left: 0px;
+        transition: 300ms;
+    }
+}
+
+
+
+
+    
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
