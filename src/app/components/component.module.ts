@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ToolbarComponent } from './toolbar/toolbar.component';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import {MatButtonModule} from '@angular/material/button';
+import { DbService } from '../services/db.service';
 
 
 @NgModule({
@@ -15,6 +16,9 @@ import {MatButtonModule} from '@angular/material/button';
   entryComponents: [ToolbarComponent],
   exports: [
     ToolbarComponent
+  ],
+  providers: [
+    DbService
   ]
 })
 export class ComponentModule {

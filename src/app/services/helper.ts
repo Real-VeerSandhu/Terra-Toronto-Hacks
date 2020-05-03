@@ -5,6 +5,11 @@ export interface IPoint {
     longitude: number;
 }
 
+export interface ILocation {
+    iPoint: IPoint;
+    time: Date | number;
+}
+
 export function randomIPointInCircle(iPoint: IPoint, radius: number, param: 'miles' | 'km' = 'km') {
     // Convert radius from meters to degrees.
     const radiusInDegrees = radius * 1000 / 111320;

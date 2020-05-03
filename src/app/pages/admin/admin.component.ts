@@ -1,31 +1,55 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { LocalStorageService } from 'src/app/services/local-storage.service';
 import { GeolocationService, IGeoLocation } from 'src/app/services/geolocation.service';
 import { infectedLocations, randomPointGen, personalLocations, distance } from '../../data/location-data';
 import differenceInMinutes from 'date-fns/differenceInMinutes';
 import { addDays } from 'date-fns';
+import { dbPost, DbService } from 'src/app/services/db.service';
+import { ILocation } from 'src/app/services/helper';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-admin',
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.css']
 })
-export class AdminComponent implements OnInit {
+export class AdminComponent implements OnInit, OnDestroy {
 
   risk: number;
   exposures = 0;
 
-  locationsArray = [];
-  covidArray = [];
+  locationsArray: ILocation[] = [];
+  covidArray: ILocation[] = [];
 
   mouseOn = false;
+  sub: Subscription;
 
-  constructor(private ls: LocalStorageService, private gloc: GeolocationService) { }
+  constructor(private ls: LocalStorageService, private gloc: GeolocationService, private db: DbService) { }
 
 
   ngOnInit() {
+    this.sub = this.db.getData().subscribe(r => {
+      console.log('data', r);
+      console.log('db data', r);
+      for (const key in r) {
+        if (r.hasOwnProperty(key)) {
+          const element = <any>r[key];
+          for (const iterator of element) {
+            iterator.time = new Date(iterator.time);
+          }
+          this.covidArray = this.covidArray.concat(element);
+          console.log('covid array: ', this.covidArray);
+          
+        }
+      }
+      this.covidArray = <any>r;
+    });
+
   }
 
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
+  }
   hover() {
     console.log('HOVER');
     this.mouseOn = true;
@@ -37,7 +61,8 @@ export class AdminComponent implements OnInit {
   }
 
   seed() {
-    
+    this.covidGen();
+    this.db.addData(<any>this.covidArray);
   }
 
   test() {
@@ -49,10 +74,10 @@ export class AdminComponent implements OnInit {
         speed: (<any>r).coords.speed
       };
       this.ls.create(loc)
-      .then( () => {
-        this.ls.getData();
-      });
-    }).catch (error => {
+        .then(() => {
+          this.ls.getData();
+        });
+    }).catch(error => {
       console.log(error);
     });
   }
@@ -81,15 +106,16 @@ export class AdminComponent implements OnInit {
     console.log('Locations Array: ', this.locationsArray);
   }
   distanceFinder() {
-    this.covidGen();
+    // this.covidGen();
     this.allGen();
     // this.exposures = 0;
+
     for (const bothLocation of this.locationsArray) {
       for (const covidLocation of this.covidArray) {
-        const distanceOfTwoPoints = distance(bothLocation.point, covidLocation.point);
+        const distanceOfTwoPoints = distance(bothLocation.iPoint, covidLocation.iPoint);
         if (distanceOfTwoPoints < 10) {
           if (Math.abs(differenceInMinutes(bothLocation.time, covidLocation.time)) < 30) {
-            this.exposures = this.exposures +  1;
+            this.exposures = this.exposures + 1;
             console.log('Time difference: ', Math.abs(differenceInMinutes(bothLocation.time, covidLocation.time)));
             console.log(distanceOfTwoPoints, 'meters');
           }
@@ -98,4 +124,5 @@ export class AdminComponent implements OnInit {
     }
     console.log('Exposures: ', this.exposures);
   }
+
 }

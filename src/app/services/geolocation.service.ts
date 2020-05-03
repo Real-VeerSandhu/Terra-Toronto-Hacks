@@ -3,7 +3,8 @@ import { Injectable } from '@angular/core';
 export interface IGeoLocation {
   latitude: number;
   longitude: number;
-  speed: number;
+  time?: Date;
+  speed?: number;
 }
 
 @Injectable({

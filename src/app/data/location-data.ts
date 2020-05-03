@@ -1,4 +1,4 @@
-import { IPoint, randomIPointInCircle } from '../services/helper';
+import { IPoint, randomIPointInCircle, ILocation } from '../services/helper';
 import { differenceInMinutes, addMinutes } from 'date-fns';
 
 export const infectedLocations = [
@@ -19,15 +19,15 @@ export const personalLocations = [
     { latitude: 43.6875836, longitude: -79.7636955 } // <-- Close to first infected location
 ];
 
-export function randomPointGen(iPoint: IPoint, startWindow: Date, endWindow: Date) {
+export function randomPointGen(iPoint: IPoint, startWindow: Date, endWindow: Date): ILocation {
     let time: Date;
     const point = randomIPointInCircle(iPoint, 0.01);
     const difference = differenceInMinutes(startWindow, endWindow);
 
     const randomMinute = getRandomInt(difference);
-    time = addMinutes(startWindow, randomMinute);
+    time = addMinutes(startWindow, randomMinute).valueOf();
 
-    return { point, time };
+    return { iPoint: point, time };
 }
 
 function getRandomInt(max) {

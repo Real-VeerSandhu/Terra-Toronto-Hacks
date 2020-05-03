@@ -8,6 +8,7 @@ import { GeolocationService } from './services/geolocation.service';
 import { IonicStorageModule } from '@ionic/storage';
 import { firebaseConfig } from 'src/core/config';
 import { AngularFireModule } from '@angular/fire';
+import { AngularFireDatabaseModule } from '@angular/fire/database';
 
 
 
@@ -21,6 +22,7 @@ import { AngularFireModule } from '@angular/fire';
     BrowserAnimationsModule,
     IonicStorageModule.forRoot(),
     AngularFireModule.initializeApp(firebaseConfig),
+    AngularFireDatabaseModule
   ],
   exports: [
 
