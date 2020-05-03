@@ -5,13 +5,11 @@
     <div [ngClass]="{unhover: !mouseOn, hover: mouseOn}">
         <mat-card class="card3">
             <div class="risk-container">
-                <h1>Community Risk {{riskDes}}</h1>
+                <h1>Community Risk</h1>
                 <h4>Low Risk Popuation: {{low}}</h4>
                 <h4>Moderate Risk Popuation: {{mod}}</h4>
                 <h4>High Risk Popuation: {{high}}</h4>
                 <h4>Very High Risk Popuation: {{veryHigh}}</h4>
-                <mat-progress-spinner class="spinner" diameter="200" color="black" mode="determinate" [value]="risk">
-                </mat-progress-spinner>
             </div>
         </mat-card>
     </div>
