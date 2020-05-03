@@ -25,8 +25,8 @@ export class DbService {
 
   constructor(private db: AngularFireDatabase) { }
 
-  addData(data: IGeoLocation) {
-    const ref = this.db.list('infected-data');
+  addData(data: IGeoLocation, path: string) {
+    const ref = this.db.list(path);
 
     // const itemRef = this.db.object('infected-data');
     try {
@@ -35,9 +35,17 @@ export class DbService {
       console.log(error);
     }
   }
-  getData() {
-    const ref = this.db.list('infected-data');
-    return ref.valueChanges();
+  updateData(data: {}, path) {
+    const ref = this.db.object(path);
 
+    try {
+      ref.set(data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  getData(path: string) {
+    const ref = this.db.list(path);
+    return ref.valueChanges();
   }
 }

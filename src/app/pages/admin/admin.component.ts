@@ -28,7 +28,7 @@ export class AdminComponent implements OnInit, OnDestroy {
 
 
   ngOnInit() {
-    this.sub = this.db.getData().subscribe(r => {
+    this.sub = this.db.getData('infected-data').subscribe(r => {
       console.log('data', r);
       console.log('db data', r);
       for (const key in r) {
@@ -61,7 +61,7 @@ export class AdminComponent implements OnInit, OnDestroy {
 
   seed() {
     this.covidGen();
-    this.db.addData(<any>this.covidArray);
+    this.db.addData(<any>this.covidArray, 'infected-data');
   }
 
   seedLocal() {

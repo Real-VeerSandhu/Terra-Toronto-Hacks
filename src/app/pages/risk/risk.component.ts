@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { LocalStorageService } from 'src/app/services/local-storage.service';
 import { GeolocationService, IGeoLocation } from 'src/app/services/geolocation.service';
 import { infectedLocations, randomPointGen, personalLocations, distance } from '../../data/location-data';
@@ -6,7 +6,7 @@ import differenceInMinutes from 'date-fns/differenceInMinutes';
 import { addDays } from 'date-fns';
 import { DbService } from 'src/app/services/db.service';
 import { Subscription } from 'rxjs';
-import {Storage} from '@ionic/storage';
+import { Storage } from '@ionic/storage';
 
 
 @Component({
@@ -14,21 +14,28 @@ import {Storage} from '@ionic/storage';
   templateUrl: './risk.component.html',
   styleUrls: ['./risk.component.css']
 })
-export class RiskComponent implements OnInit {
+export class RiskComponent implements OnInit, OnDestroy {
 
   risk: number;
+  riskDes = 'Low';
   exposures = 0;
+  low: number;
+  mod: number;
+  high: number;
+  veryHigh: number;
 
   locationsArray = [];
   covidArray = [];
 
   mouseOn = false;
   sub: Subscription;
+  sub2: Subscription;
+
 
   constructor(private ls: LocalStorageService, private gloc: GeolocationService, private db: DbService, private storage: Storage) { }
 
   ngOnInit() {
-    this.sub = this.db.getData().subscribe(r => {
+    this.sub = this.db.getData('infected-data').subscribe(r => {
       console.log('data', r);
       console.log('db data', r);
       for (const key in r) {
@@ -43,18 +50,28 @@ export class RiskComponent implements OnInit {
       // this.covidArray = <any>r;
     });
     this.storage.forEach(t => {
-      console.log('t', t);
+      // console.log('t', t);
       this.locationsArray = t;
     });
+    this.sub2 = this.db.getData('community').subscribe(c => {
+      this.low = <any>c[1];
+      this.mod = <any>c[2];
+      this.high = <any>c[0];
+      this.veryHigh = <any>c[3];
+      console.log({ c });
+    });
+  }
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
+    this.sub2.unsubscribe();
+
   }
 
   hover() {
-    console.log('HOVER');
     this.mouseOn = true;
 
   }
   unhover() {
-    console.log('UNHOVER');
     this.mouseOn = false;
   }
   genData() {
@@ -67,7 +84,7 @@ export class RiskComponent implements OnInit {
         this.locationsArray.push(result);
       }
     }
-    console.log('Locations Array: ', this.locationsArray);
+    // console.log('Locations Array: ', this.locationsArray);
   }
   getRisk() {
     this.genData();
@@ -84,6 +101,23 @@ export class RiskComponent implements OnInit {
       }
     }
     console.log('Exposures FROM getRisk(): ', this.exposures);
+    if (this.exposures === 0) {
+      this.riskDes = 'Low';
+      // this.db.updateData({low: this.low + 1}, 'community/low');
+    }
+    if (this.exposures >= 1 && this.exposures < 3) {
+      this.risk = 33;
+      this.riskDes = 'Moderate';
+      this.db.updateData({ mod: this.mod + 1, low: this.low, high: this.high, veryHigh: this.veryHigh }, 'community');
+    } else if (this.exposures >= 4 && this.exposures < 10) {
+      this.risk = 66;
+      this.riskDes = 'High';
+      this.db.updateData({ mod: this.mod, low: this.low, high: this.high + 1, veryHigh: this.veryHigh }, 'community');
+    } else if (this.exposures >= 10) {
+      this.risk = 80;
+      this.db.updateData({ mod: this.mod, low: this.low, high: this.high, veryHigh: this.veryHigh + 1 }, 'community');
+      this.riskDes = 'Very High';
+    }
   }
 }
 
