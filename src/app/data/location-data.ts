@@ -20,7 +20,7 @@ export const personalLocations = [
 ];
 
 export function randomPointGen(iPoint: IPoint, startWindow: Date, endWindow: Date): ILocation {
-    let time: Date;
+    let time: Date | number;
     const point = randomIPointInCircle(iPoint, 0.01);
     const difference = differenceInMinutes(startWindow, endWindow);
 

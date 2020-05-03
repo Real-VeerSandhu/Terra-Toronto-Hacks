@@ -39,10 +39,9 @@ export class AdminComponent implements OnInit, OnDestroy {
           }
           this.covidArray = this.covidArray.concat(element);
           console.log('covid array: ', this.covidArray);
-          
         }
       }
-      this.covidArray = <any>r;
+      // this.covidArray = <any>r;
     });
 
   }
@@ -63,6 +62,15 @@ export class AdminComponent implements OnInit, OnDestroy {
   seed() {
     this.covidGen();
     this.db.addData(<any>this.covidArray);
+  }
+
+  seedLocal() {
+    this.allGen();
+    this.ls.create(this.locationsArray).then(() => {
+      this.ls.getData();
+    }).catch(error => {
+      console.log(error);
+    });
   }
 
   test() {
@@ -111,7 +119,7 @@ export class AdminComponent implements OnInit, OnDestroy {
     // this.exposures = 0;
 
     for (const bothLocation of this.locationsArray) {
-      for (const covidLocation of this.covidArray) {
+      for (const covidLocation of <any>this.covidArray) {
         const distanceOfTwoPoints = distance(bothLocation.iPoint, covidLocation.iPoint);
         if (distanceOfTwoPoints < 10) {
           if (Math.abs(differenceInMinutes(bothLocation.time, covidLocation.time)) < 30) {

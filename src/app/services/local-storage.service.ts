@@ -13,7 +13,7 @@ export class LocalStorageService {
     const result = await this.storage.set(`${new Date().valueOf()}`, data);
   }
   async getData() {
-    this.storage.forEach(r => {
+    return this.storage.forEach(r => {
       console.log('R', r);
     });
   }

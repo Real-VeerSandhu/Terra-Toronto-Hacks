@@ -4,6 +4,10 @@ import { GeolocationService, IGeoLocation } from 'src/app/services/geolocation.s
 import { infectedLocations, randomPointGen, personalLocations, distance } from '../../data/location-data';
 import differenceInMinutes from 'date-fns/differenceInMinutes';
 import { addDays } from 'date-fns';
+import { DbService } from 'src/app/services/db.service';
+import { Subscription } from 'rxjs';
+import {Storage} from '@ionic/storage';
+
 
 @Component({
   selector: 'app-risk',
@@ -19,10 +23,29 @@ export class RiskComponent implements OnInit {
   covidArray = [];
 
   mouseOn = false;
+  sub: Subscription;
 
-  constructor(private ls: LocalStorageService, private gloc: GeolocationService) { }
+  constructor(private ls: LocalStorageService, private gloc: GeolocationService, private db: DbService, private storage: Storage) { }
 
   ngOnInit() {
+    this.sub = this.db.getData().subscribe(r => {
+      console.log('data', r);
+      console.log('db data', r);
+      for (const key in r) {
+        if (r.hasOwnProperty(key)) {
+          const element = <any>r[key];
+          for (const iterator of element) {
+            iterator.time = new Date(iterator.time);
+          }
+          this.covidArray = this.covidArray.concat(element);
+        }
+      }
+      // this.covidArray = <any>r;
+    });
+    this.storage.forEach(t => {
+      console.log('t', t);
+      this.locationsArray = t;
+    });
   }
 
   hover() {
@@ -34,35 +57,7 @@ export class RiskComponent implements OnInit {
     console.log('UNHOVER');
     this.mouseOn = false;
   }
-  test() {
-    this.gloc.getLocation().then(r => {
-      console.log(r);
-      const loc: IGeoLocation = {
-        longitude: (<any>r).coords.longitude,
-        latitude: (<any>r).coords.latitude,
-        speed: (<any>r).coords.speed
-      };
-      this.ls.create(loc)
-      .then( () => {
-        this.ls.getData();
-      });
-    }).catch (error => {
-      console.log(error);
-    });
-  }
-  covidGen() {
-    this.covidArray = [];
-    const startWindow = new Date(2020, 3, 11);
-    const endWindow = addDays(startWindow, 14);
-    for (const point of infectedLocations.concat(personalLocations)) {
-      for (let i = 0; i < 10; i++) {
-        const result = randomPointGen(point, startWindow, endWindow);
-        this.covidArray.push(result);
-      }
-    }
-    console.log('Covid Array: ', this.covidArray);
-  }
-  allGen() {
+  genData() {
     this.locationsArray = [];
     const startWindow = new Date(2020, 3, 13, 6);
     const endWindow = new Date(2020, 3, 21, 7);
@@ -74,23 +69,21 @@ export class RiskComponent implements OnInit {
     }
     console.log('Locations Array: ', this.locationsArray);
   }
-  distanceFinder() {
-    this.covidGen();
-    this.allGen();
-    // this.exposures = 0;
+  getRisk() {
+    this.genData();
     for (const bothLocation of this.locationsArray) {
-      for (const covidLocation of this.covidArray) {
-        const distanceOfTwoPoints = distance(bothLocation.point, covidLocation.point);
+      for (const covidLocation of <any>this.covidArray) {
+        const distanceOfTwoPoints = distance(bothLocation.iPoint, covidLocation.iPoint);
         if (distanceOfTwoPoints < 10) {
           if (Math.abs(differenceInMinutes(bothLocation.time, covidLocation.time)) < 30) {
-            this.exposures = this.exposures +  1;
+            this.exposures = this.exposures + 1;
             console.log('Time difference: ', Math.abs(differenceInMinutes(bothLocation.time, covidLocation.time)));
             console.log(distanceOfTwoPoints, 'meters');
           }
         }
       }
     }
-    console.log('Exposures: ', this.exposures);
+    console.log('Exposures FROM getRisk(): ', this.exposures);
   }
 }
 
